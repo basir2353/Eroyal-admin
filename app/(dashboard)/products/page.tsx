@@ -23,6 +23,7 @@ import {
   toDatetimeLocalValue,
 } from "@/lib/product-offer";
 import { MediaImagePicker } from "@/components/shared/media-image-picker";
+import { DateTimePicker } from "@/components/shared/datetime-picker";
 
 type Category = { _id?: string; id?: string; name: string };
 
@@ -202,8 +203,23 @@ export default function ProductsPage() {
     if (form.onSale) {
       const regular = Number(form.regularPrice);
       const sale = Number(form.salePrice);
+      if (!form.regularPrice || !Number.isFinite(regular) || regular <= 0) {
+        setFormError("Enter a valid regular price greater than 0.");
+        setSaving(false);
+        return;
+      }
+      if (regular > 9999999999.99) {
+        setFormError("Regular price is too large. Maximum allowed is 9,999,999,999.99 PKR.");
+        setSaving(false);
+        return;
+      }
       if (!form.salePrice || !Number.isFinite(sale) || sale <= 0) {
         setFormError("Sale price is required when the sale is enabled.");
+        setSaving(false);
+        return;
+      }
+      if (sale > 9999999999.99) {
+        setFormError("Sale price is too large. Maximum allowed is 9,999,999,999.99 PKR.");
         setSaving(false);
         return;
       }
@@ -212,6 +228,14 @@ export default function ProductsPage() {
         setSaving(false);
         return;
       }
+    } else if (!form.regularPrice || !Number.isFinite(Number(form.regularPrice)) || Number(form.regularPrice) <= 0) {
+      setFormError("Enter a valid regular price greater than 0.");
+      setSaving(false);
+      return;
+    } else if (Number(form.regularPrice) > 9999999999.99) {
+      setFormError("Regular price is too large. Maximum allowed is 9,999,999,999.99 PKR.");
+      setSaving(false);
+      return;
     }
 
     const payload = {
@@ -459,7 +483,8 @@ export default function ProductsPage() {
                       <Input
                         id="regularPrice"
                         type="number"
-                        min="0"
+                        min="1"
+                        max="9999999999"
                         step="1"
                         value={form.regularPrice}
                         onChange={(e) => {
@@ -718,7 +743,8 @@ export default function ProductsPage() {
                           <Input
                             id="salePrice"
                             type="number"
-                            min="0"
+                            min="1"
+                            max="9999999999"
                             step="1"
                             value={form.salePrice}
                             required={form.onSale}
@@ -763,24 +789,20 @@ export default function ProductsPage() {
                       <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-2">
                           <Label htmlFor="offerStartDate">Offer start (optional)</Label>
-                          <Input
+                          <DateTimePicker
                             id="offerStartDate"
-                            type="datetime-local"
                             value={form.offerStartDate}
-                            onChange={(e) =>
-                              setForm((f) => ({ ...f, offerStartDate: e.target.value }))
-                            }
+                            onChange={(offerStartDate) => setForm((f) => ({ ...f, offerStartDate }))}
+                            placeholder="Select offer start"
                           />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="offerEndDate">Offer end (optional)</Label>
-                          <Input
+                          <DateTimePicker
                             id="offerEndDate"
-                            type="datetime-local"
                             value={form.offerEndDate}
-                            onChange={(e) =>
-                              setForm((f) => ({ ...f, offerEndDate: e.target.value }))
-                            }
+                            onChange={(offerEndDate) => setForm((f) => ({ ...f, offerEndDate }))}
+                            placeholder="Select offer end"
                           />
                         </div>
                       </div>
