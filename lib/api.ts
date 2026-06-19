@@ -1,6 +1,10 @@
 import axios, { type AxiosError } from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NODE_ENV === "production"
+    ? "https://eroyal-backend-production.up.railway.app/api"
+    : "http://localhost:4000/api");
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -37,7 +41,7 @@ api.interceptors.response.use(
 export function getApiErrorMessage(error: unknown, fallback = "Something went wrong"): string {
   if (axios.isAxiosError(error)) {
     if (!error.response) {
-      return "Cannot reach the API server. Start the backend with: npm run dev:api (port 4000)";
+      return `Cannot reach the API server at ${API_URL}. Check that the backend is running and NEXT_PUBLIC_API_URL is set on Vercel.`;
     }
     return error.response.data?.message ?? fallback;
   }

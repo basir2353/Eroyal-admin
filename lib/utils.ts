@@ -37,12 +37,15 @@ export function parsePrice(value: unknown): number | null {
   return null;
 }
 
-const API_ORIGIN = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api").replace(
-  /\/api\/?$/,
-  "",
-);
+const API_ORIGIN = (
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NODE_ENV === "production"
+    ? "https://eroyal-backend-production.up.railway.app/api"
+    : "http://localhost:4000/api")
+).replace(/\/api\/?$/, "");
 export const STOREFRONT_ORIGIN =
-  process.env.NEXT_PUBLIC_STOREFRONT_URL ?? "http://localhost:3000";
+  process.env.NEXT_PUBLIC_STOREFRONT_URL ??
+  (process.env.NODE_ENV === "production" ? "https://eroyalmango.vercel.app" : "http://localhost:3000");
 
 /** Same catalog paths as the storefront — served from adminpanel/public/images. */
 const CATALOG_IMAGE_FALLBACKS: Record<string, string> = {
