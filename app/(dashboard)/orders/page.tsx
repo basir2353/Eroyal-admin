@@ -189,7 +189,7 @@ export default function OrdersPage() {
                 {search ? "No orders match your search." : "No orders yet."}
               </p>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="admin-table-scroll">
                 <table className="admin-table w-full text-sm">
                   <thead>
                     <tr className="border-b border-border bg-muted/40 text-left text-muted-foreground">
@@ -233,7 +233,7 @@ export default function OrdersPage() {
                           <td className="px-4 py-3">
                             <Button type="button" size="sm" variant="outline" onClick={() => openOrderPanel(order)}>
                               <Eye className="h-4 w-4" />
-                              View
+                              <span className="max-sm:sr-only">View</span>
                             </Button>
                           </td>
                         </tr>
@@ -248,15 +248,15 @@ export default function OrdersPage() {
       </div>
 
       {panelOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/40">
+        <div className="fixed inset-0 z-[60] flex justify-end bg-black/40">
           <button type="button" className="absolute inset-0 cursor-default" aria-label="Close" onClick={closePanel} />
-          <div className="relative flex h-full w-full max-w-2xl flex-col border-l border-border bg-background shadow-2xl">
-            <div className="flex items-center justify-between border-b border-border px-5 py-4">
-              <div>
-                <h2 className="text-lg font-semibold">
+          <div className="admin-slide-panel max-w-2xl">
+            <div className="flex items-start justify-between gap-3 border-b border-border px-4 py-4 sm:px-5">
+              <div className="min-w-0 flex-1">
+                <h2 className="truncate text-lg font-semibold">
                   Order {selectedOrder?.orderNumber ?? "Details"}
                 </h2>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground max-sm:hidden">
                   Complete checkout submission from the customer
                 </p>
               </div>
@@ -265,7 +265,7 @@ export default function OrdersPage() {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-5 py-5">
+            <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-5">
               {panelLoading || !selectedOrder ? (
                 <p className="text-sm text-muted-foreground">Loading order details…</p>
               ) : (
@@ -320,7 +320,7 @@ export default function OrdersPage() {
                     <div className="border-b border-border bg-muted/30 px-4 py-3">
                       <h3 className="font-semibold">Order items</h3>
                     </div>
-                    <div className="overflow-x-auto">
+                    <div className="admin-table-scroll">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-border text-left text-muted-foreground">

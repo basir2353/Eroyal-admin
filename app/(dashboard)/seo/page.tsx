@@ -73,33 +73,35 @@ export default function SeoPage() {
         <Card className="shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Pages</CardTitle>
-            <CardDescription>Select a page to edit its SEO tags.</CardDescription>
+            <CardDescription className="max-lg:hidden">Select a page to edit its SEO tags.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-1 p-3 pt-0">
-            {pages.map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => setActive(p)}
-                className={`block w-full rounded-lg px-3 py-2.5 text-left text-sm capitalize transition-colors ${
-                  active === p
-                    ? "bg-primary text-primary-foreground font-medium shadow-sm"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
+            <div className="admin-seo-tabs lg:space-y-1">
+              {pages.map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setActive(p)}
+                  className={`shrink-0 rounded-lg px-3 py-2.5 text-left text-sm capitalize transition-colors lg:block lg:w-full ${
+                    active === p
+                      ? "bg-primary text-primary-foreground font-medium shadow-sm"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm">
-          <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 border-b border-border/60 pb-6">
-            <div>
+        <Card className="shadow-sm min-w-0">
+          <CardHeader className="admin-card-header gap-4 space-y-0 border-b border-border/60 pb-6">
+            <div className="min-w-0">
               <CardTitle className="capitalize">{active} SEO</CardTitle>
               <CardDescription>Title and description shown in Google search results.</CardDescription>
             </div>
-            <Button onClick={save} disabled={saving}>
+            <Button onClick={save} disabled={saving} className="w-full sm:w-auto shrink-0">
               {saving ? "Saving…" : "Save"}
             </Button>
           </CardHeader>

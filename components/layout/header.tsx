@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { LogOut, Moon, Sun } from "lucide-react";
+import { LogOut, Menu, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
 import { useThemeStore } from "@/store/themeStore";
+import { useSidebar } from "@/components/layout/sidebar-context";
 
 interface HeaderProps {
   title: string;
@@ -15,6 +16,7 @@ export function Header({ title, description }: HeaderProps) {
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const { theme, toggle } = useThemeStore();
+  const { toggle: toggleSidebar } = useSidebar();
 
   const handleLogout = () => {
     logout();
@@ -30,15 +32,28 @@ export function Header({ title, description }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur-md">
-      <div className="flex h-16 items-center justify-between gap-4 px-6 lg:px-8">
-        <div className="min-w-0">
-          <h1 className="truncate text-lg font-semibold tracking-tight">{title}</h1>
-          {description && (
-            <p className="truncate text-sm text-muted-foreground">{description}</p>
-          )}
+      <div className="flex h-14 min-h-14 items-center justify-between gap-2 px-4 sm:h-16 sm:gap-4 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            className="shrink-0 lg:hidden"
+            aria-label="Open menu"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+          <div className="min-w-0">
+            <h1 className="truncate text-base font-semibold tracking-tight sm:text-lg">{title}</h1>
+            {description && (
+              <p className="truncate text-sm text-muted-foreground max-sm:hidden">
+                {description}
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <Button variant="ghost" size="icon" onClick={toggle} aria-label="Toggle theme">
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>

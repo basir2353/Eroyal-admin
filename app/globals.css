@@ -82,8 +82,19 @@ body {
   min-height: 100vh;
 }
 
+.admin-main {
+  min-width: 0;
+  width: 100%;
+}
+
 .admin-content {
-  padding: 1.5rem;
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  .admin-content {
+    padding: 1.5rem;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -94,6 +105,65 @@ body {
 
 .admin-content-inner {
   max-width: 80rem;
+}
+
+.admin-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .admin-card-header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.admin-table-scroll {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+}
+
+.admin-table th,
+.admin-table td {
+  white-space: nowrap;
+}
+
+@media (max-width: 639px) {
+  .admin-table th,
+  .admin-table td {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+.admin-slide-panel {
+  position: relative;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  border-left: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+}
+
+.admin-seo-tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 1024px) {
+  .admin-seo-tabs {
+    flex-direction: column;
+    overflow-x: visible;
+    padding-bottom: 0;
+  }
 }
 
 /* ── Dashboard 3D charts ── */

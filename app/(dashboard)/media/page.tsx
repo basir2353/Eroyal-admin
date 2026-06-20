@@ -58,7 +58,7 @@ export default function MediaPage() {
             placeholder="Search files..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="max-w-sm"
+            className="w-full sm:max-w-sm"
           />
           <input
             ref={inputRef}
@@ -79,13 +79,13 @@ export default function MediaPage() {
         </div>
 
         {loading ? (
-          <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
               <Skeleton key={i} className="h-40" />
             ))}
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {items.map((item) => (
               <Card key={item._id} className="overflow-hidden shadow-sm">
                 {item.fileType?.startsWith("image") ? (

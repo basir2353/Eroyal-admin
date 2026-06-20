@@ -7,7 +7,7 @@ export default function CategoriesPage() {
   return (
     <div>
       <PageHeader title="Categories" description="Manage product categories" />
-      <div className="p-8">
+      <div className="admin-content">
         <DataList
           endpoint="/categories"
           title="All Categories"

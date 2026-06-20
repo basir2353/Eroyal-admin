@@ -7,7 +7,7 @@ export default function UsersPage() {
   return (
     <div>
       <PageHeader title="Users & Roles" description="Manage admin users and role-based permissions" />
-      <div className="p-8">
+      <div className="admin-content">
         <DataList
           endpoint="/users"
           title="Admin Users"

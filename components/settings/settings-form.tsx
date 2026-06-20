@@ -64,12 +64,12 @@ export function SettingsForm({
 
   return (
     <Card className="shadow-sm">
-      <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 border-b border-border/60 pb-6">
+      <CardHeader className="admin-card-header gap-4 space-y-0 border-b border-border/60 pb-6">
         <div>
           <CardTitle>{title}</CardTitle>
           {description && <CardDescription className="mt-1">{description}</CardDescription>}
         </div>
-        <Button onClick={handleSave} disabled={saving}>
+        <Button onClick={handleSave} disabled={saving} className="w-full sm:w-auto shrink-0">
           {saving ? "Saving…" : "Save Settings"}
         </Button>
       </CardHeader>

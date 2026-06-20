@@ -49,7 +49,7 @@ export function DataList({ endpoint, title, description, columns }: DataListProp
 
   return (
     <Card className="shadow-sm">
-      <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
+      <CardHeader className="admin-card-header gap-4 space-y-0">
         <div>
           <CardTitle>{title}</CardTitle>
           {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
@@ -57,7 +57,7 @@ export function DataList({ endpoint, title, description, columns }: DataListProp
         <Badge variant="secondary">{items.length} records</Badge>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="overflow-x-auto">
+        <div className="admin-table-scroll">
           <table className="admin-table w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/40 text-left text-muted-foreground">

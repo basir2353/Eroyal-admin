@@ -123,12 +123,12 @@ export default function DashboardPage() {
             <CardHeader><CardTitle>Recent Orders</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               {data.widgets.recentOrders.map((order) => (
-                <div key={String(order._id)} className="flex items-center justify-between text-sm">
-                  <div>
-                    <p className="font-medium">{String(order.orderNumber ?? order._id)}</p>
+                <div key={String(order._id)} className="flex items-center justify-between gap-3 text-sm">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">{String(order.orderNumber ?? order._id)}</p>
                     <p className="text-muted-foreground">{formatDate(order.createdAt as string)}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="shrink-0 text-right">
                     <Badge variant="secondary">{String(order.status)}</Badge>
                     <p className="mt-1 font-medium">{formatCurrency(Number(order.total ?? 0))}</p>
                   </div>
@@ -156,9 +156,9 @@ export default function DashboardPage() {
             <CardHeader><CardTitle>Recent Customers</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               {data.widgets.recentCustomers.map((c) => (
-                <div key={String(c._id)} className="flex justify-between text-sm">
-                  <span>{String(c.name)}</span>
-                  <span className="text-muted-foreground">{String(c.email)}</span>
+                <div key={String(c._id)} className="flex justify-between gap-3 text-sm">
+                  <span className="min-w-0 truncate">{String(c.name)}</span>
+                  <span className="shrink-0 truncate text-muted-foreground max-w-[50%]">{String(c.email)}</span>
                 </div>
               ))}
             </CardContent>

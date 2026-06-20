@@ -7,7 +7,7 @@ export default function CouponsPage() {
   return (
     <div>
       <PageHeader title="Coupons" description="Manage discount codes and promotions" />
-      <div className="p-8">
+      <div className="admin-content">
         <DataList
           endpoint="/coupons"
           title="All Coupons"

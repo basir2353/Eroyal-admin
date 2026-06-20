@@ -236,7 +236,7 @@ export default function BlogsPage() {
                 {search ? "No posts match your search." : "No blog posts yet. Click Add Post to create one."}
               </p>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="admin-table-scroll">
                 <table className="admin-table w-full text-sm">
                   <thead>
                     <tr className="border-b border-border bg-muted/40 text-left text-muted-foreground">
@@ -338,20 +338,20 @@ export default function BlogsPage() {
       </div>
 
       {panelOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/40">
+        <div className="fixed inset-0 z-[60] flex justify-end bg-black/40">
           <button
             type="button"
             className="absolute inset-0 cursor-default"
             aria-label="Close panel"
             onClick={closePanel}
           />
-          <div className="relative flex h-full w-full max-w-xl flex-col border-l border-border bg-background shadow-2xl">
-            <div className="flex items-center justify-between border-b border-border px-5 py-4">
-              <div>
-                <h2 className="text-lg font-semibold">
+          <div className="admin-slide-panel max-w-xl">
+            <div className="flex items-start justify-between gap-3 border-b border-border px-4 py-4 sm:px-5">
+              <div className="min-w-0 flex-1">
+                <h2 className="truncate text-lg font-semibold">
                   {editingId ? "Edit Blog Post" : "Add Blog Post"}
                 </h2>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground max-sm:hidden">
                   Set status to Published to show the post on the website.
                 </p>
               </div>
@@ -366,7 +366,7 @@ export default function BlogsPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-              <div className="flex-1 space-y-6 overflow-y-auto px-5 py-5">
+              <div className="flex-1 space-y-6 overflow-y-auto px-4 py-5 sm:px-5">
                 <section className="space-y-4">
                   <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                     Post details
@@ -512,7 +512,7 @@ export default function BlogsPage() {
                 {formError && <p className="text-sm text-destructive">{formError}</p>}
               </div>
 
-              <div className="flex gap-3 border-t border-border px-5 py-4">
+              <div className="flex flex-col gap-3 border-t border-border px-4 py-4 sm:flex-row sm:px-5">
                 <Button type="submit" disabled={saving} className="flex-1">
                   {saving ? "Saving…" : editingId ? "Save Changes" : "Create Post"}
                 </Button>
