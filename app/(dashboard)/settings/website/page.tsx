@@ -24,7 +24,7 @@ export default function WebsiteSettingsPage() {
             { key: "address", label: "Business Address", type: "text" },
             { key: "footerContent", label: "Footer About Text", type: "textarea", hint: "Short description shown in the website footer." },
             { key: "copyrightText", label: "Copyright Text", type: "text" },
-            { key: "socialLinks", label: "Social Links", type: "json", hint: "JSON array: [{ \"platform\": \"facebook\", \"url\": \"...\" }]" },
+            { key: "socialLinks", label: "Social Links", type: "json", hint: "JSON array: [{ \"platform\": \"facebook|instagram|whatsapp\", \"url\": \"...\" }]" },
           ]}
         />
       </div>
