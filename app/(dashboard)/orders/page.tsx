@@ -14,13 +14,16 @@ import { formatCurrency, formatDate, resolveMediaUrl } from "@/lib/utils";
 import {
   ORDER_STATUSES,
   formatPaymentMethod,
+  formatPaymentStatus,
   formatStatusLabel,
   getCustomerEmail,
   getCustomerName,
   getCustomerPhone,
   getShippingAddress,
+  isBankTransfer,
   orderId,
   orderStatus,
+  paymentCompleteSuccessMessage,
   statusBadgeVariant,
   type OrderRecord,
 } from "@/lib/order-utils";
@@ -43,6 +46,7 @@ export default function OrdersPage() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [panelLoading, setPanelLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savingPayment, setSavingPayment] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [statusForm, setStatusForm] = useState({
     status: "pending",
@@ -136,6 +140,28 @@ export default function OrdersPage() {
       setSaving(false);
     }
   };
+
+  const handleCompletePayment = async () => {
+    if (!selectedOrder) return;
+    const id = orderId(selectedOrder);
+    setSavingPayment(true);
+    setSaveMessage(null);
+    try {
+      const updated = await apiPatch<OrderRecord>(`/orders/${id}/payment-complete`);
+      setSelectedOrder(updated);
+      setSaveMessage(paymentCompleteSuccessMessage(updated));
+      await loadOrders();
+    } catch {
+      setSaveMessage("Could not mark payment as complete.");
+    } finally {
+      setSavingPayment(false);
+    }
+  };
+
+  const selectedPaymentStatus = String(
+    selectedOrder?.paymentStatusLabel ?? selectedOrder?.paymentStatus ?? "pending",
+  ).toLowerCase();
+  const selectedPaymentComplete = selectedPaymentStatus.includes("paid");
 
   const address = selectedOrder ? getShippingAddress(selectedOrder) : {};
   const items = (selectedOrder?.items ?? []) as Record<string, unknown>[];
@@ -381,8 +407,55 @@ export default function OrdersPage() {
                     />
                     <DetailRow
                       label="Payment status"
-                      value={formatStatusLabel(String(selectedOrder.paymentStatusLabel ?? "pending"))}
+                      value={formatPaymentStatus(String(selectedOrder.paymentStatusLabel ?? "pending"))}
                     />
+                    {selectedOrder.paymentReceiptUploadedAt ? (
+                      <DetailRow
+                        label="Receipt uploaded"
+                        value={formatDate(String(selectedOrder.paymentReceiptUploadedAt))}
+                      />
+                    ) : null}
+                    {selectedOrder.paymentReceiptUrl ? (
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Payment receipt</p>
+                        <a
+                          href={resolveMediaUrl(String(selectedOrder.paymentReceiptUrl))}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={resolveMediaUrl(String(selectedOrder.paymentReceiptUrl))}
+                            alt="Payment receipt"
+                            className="max-h-64 rounded-lg border border-border object-contain bg-background"
+                          />
+                        </a>
+                        <a
+                          href={resolveMediaUrl(String(selectedOrder.paymentReceiptUrl))}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary hover:underline"
+                        >
+                          Open receipt in new tab
+                        </a>
+                      </div>
+                    ) : null}
+                    {isBankTransfer(selectedOrder) &&
+                    selectedOrder.paymentReceiptUrl &&
+                    !selectedPaymentComplete ? (
+                      <Button
+                        type="button"
+                        className="mt-2"
+                        onClick={handleCompletePayment}
+                        disabled={savingPayment}
+                      >
+                        {savingPayment ? "Saving…" : "Mark payment complete"}
+                      </Button>
+                    ) : null}
+                    {isBankTransfer(selectedOrder) && selectedPaymentComplete ? (
+                      <p className="text-sm font-medium text-emerald-600">Payment verified and complete.</p>
+                    ) : null}
                   </section>
 
                   {(selectedOrder.notes || selectedOrder.trackingNumber || selectedOrder.couponCode) && (

@@ -12,7 +12,9 @@ import {
   Truck,
   ChevronDown,
   FileText,
+  Image,
   X,
+  CircleDollarSign,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -38,13 +40,17 @@ const navSections: NavSection[] = [
     items: [
       { type: "link", label: "Products", href: "/products", icon: Package },
       { type: "link", label: "Orders", href: "/orders", icon: ShoppingCart },
+      { type: "link", label: "Complete Payment", href: "/complete-payment", icon: CircleDollarSign },
       { type: "link", label: "Customers", href: "/customers", icon: Users },
       { type: "link", label: "Contact Messages", href: "/contact", icon: MessageSquare },
     ],
   },
   {
     title: "Content",
-    items: [{ type: "link", label: "Blogs", href: "/blogs", icon: FileText }],
+    items: [
+      { type: "link", label: "Carousel Banners", href: "/carousel", icon: Image },
+      { type: "link", label: "Blogs", href: "/blogs", icon: FileText },
+    ],
   },
   {
     title: "Configuration",
@@ -54,6 +60,8 @@ const navSections: NavSection[] = [
         label: "Settings",
         icon: Settings,
         children: [
+          { label: "Announcements", href: "/settings/announcements" },
+          { label: "SMS / WhatsApp", href: "/settings/sms" },
           { label: "Payments", href: "/settings/payments" },
           { label: "Email (SMTP)", href: "/settings/email" },
           { label: "Change Password", href: "/settings/password" },

@@ -49,9 +49,21 @@ export type OrderRecord = Record<string, unknown> & {
   couponCode?: string;
   notes?: string;
   trackingNumber?: string;
+  paymentReceiptUrl?: string;
+  paymentReceiptUploadedAt?: string;
+  paymentCompleteEmailSent?: boolean;
+  paymentCompleteEmailError?: string | null;
   timeline?: { status?: string; note?: string; createdAt?: string }[];
   createdAt?: string;
 };
+
+export type PaymentVerificationFilter = "pending_review" | "awaiting_receipt" | "completed";
+
+export const PAYMENT_VERIFICATION_FILTERS: PaymentVerificationFilter[] = [
+  "pending_review",
+  "awaiting_receipt",
+  "completed",
+];
 
 export function orderId(order: OrderRecord) {
   return String(order._id ?? order.id ?? "");
@@ -86,6 +98,9 @@ export function statusBadgeVariant(
 export function formatPaymentMethod(method?: string) {
   if (!method) return "—";
   if (method === "cash_on_delivery") return "Cash on delivery";
+  if (method === "direct_bank_transfer" || method === "bank_transfer") {
+    return "Direct bank transfer";
+  }
   return method.replace(/_/g, " ");
 }
 
@@ -137,4 +152,38 @@ export function formatAddressLines(address: ShippingAddress) {
 
 export function formatStatusLabel(status: string) {
   return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+export function formatPaymentStatus(status?: string) {
+  if (!status) return "Pending";
+  if (status.toLowerCase() === "paid") return "Complete";
+  return formatStatusLabel(status);
+}
+
+export function isBankTransfer(order: OrderRecord) {
+  const method = String(order.paymentMethod ?? "").toLowerCase();
+  return method === "direct_bank_transfer" || method === "bank_transfer";
+}
+
+export function paymentVerificationFilterLabel(filter: PaymentVerificationFilter) {
+  switch (filter) {
+    case "pending_review":
+      return "Receipt to review";
+    case "awaiting_receipt":
+      return "Awaiting receipt";
+    case "completed":
+      return "Payment complete";
+    default:
+      return filter;
+  }
+}
+
+export function paymentCompleteSuccessMessage(order: OrderRecord) {
+  if (order.paymentCompleteEmailSent) {
+    return "Payment marked as complete. Customer notified by email.";
+  }
+  if (order.paymentCompleteEmailError) {
+    return `Payment marked as complete. Email not sent: ${String(order.paymentCompleteEmailError)}`;
+  }
+  return "Payment marked as complete.";
 }

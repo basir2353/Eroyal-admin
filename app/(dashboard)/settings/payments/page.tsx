@@ -17,9 +17,14 @@ export default function PaymentsSettingsPage() {
             { key: "easyPaisa", label: "EasyPaisa", type: "boolean" },
             { key: "jazzCash", label: "JazzCash", type: "boolean" },
             { key: "bankTransfer", label: "Bank Transfer", type: "boolean" },
-            { key: "easyPaisaAccount", label: "EasyPaisa Account", type: "text" },
-            { key: "jazzCashAccount", label: "JazzCash Account", type: "text" },
-            { key: "bankDetails", label: "Bank Details", type: "textarea" },
+            { key: "paymentInstructions", label: "Payment Instructions", type: "textarea" },
+            { key: "jazzCashAccount", label: "JazzCash Account Number", type: "text" },
+            { key: "easyPaisaAccount", label: "EasyPaisa Account Number", type: "text" },
+            { key: "bankName", label: "Bank Name", type: "text" },
+            { key: "bankAccountTitle", label: "Bank Account Title", type: "text" },
+            { key: "bankAccountNumber", label: "Bank Account Number", type: "text" },
+            { key: "bankIban", label: "Bank IBAN", type: "text" },
+            { key: "bankDetails", label: "Additional Bank Details", type: "textarea" },
           ]}
         />
       </div>

@@ -1,10 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ImagePlus, Trash2, Upload, X } from "lucide-react";
+import { ImagePlus, Link2, Trash2, Upload, X } from "lucide-react";
 import { apiGet, apiUploadFile, getApiErrorMessage } from "@/lib/api";
+import {
+  CAROUSEL_BANNER_SIZE_LABEL,
+  normalizeCarouselBannerFile,
+  resolveCarouselBannerUrl,
+} from "@/lib/carousel-banner";
 import { resolveMediaUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface MediaItem {
@@ -22,6 +28,12 @@ interface MediaImagePickerProps {
   /** When 1, only one image is kept (replace on upload/select). */
   maxImages?: number;
   helpText?: string;
+  /** Normalize uploads to exact carousel banner dimensions (1024×320). */
+  carouselBanner?: boolean;
+  /** Allow pasting a direct image URL instead of uploading a file. */
+  allowImageUrl?: boolean;
+  /** Unique id for the URL input (required when multiple pickers are on one page). */
+  imageUrlInputId?: string;
 }
 
 export function MediaImagePicker({
@@ -30,15 +42,29 @@ export function MediaImagePicker({
   label = "Product Images",
   maxImages,
   helpText,
+  carouselBanner = false,
+  allowImageUrl = false,
+  imageUrlInputId = "image-url-input",
 }: MediaImagePickerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [urlApplying, setUrlApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
+  const [urlDraft, setUrlDraft] = useState("");
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [libraryItems, setLibraryItems] = useState<MediaItem[]>([]);
   const [libraryLoading, setLibraryLoading] = useState(false);
 
   const singleImage = maxImages === 1;
+
+  useEffect(() => {
+    if (singleImage && value[0]) {
+      setUrlDraft(value[0]);
+    } else if (!value.length) {
+      setUrlDraft("");
+    }
+  }, [value, singleImage]);
 
   useEffect(() => {
     if (!libraryOpen) return;
@@ -63,9 +89,11 @@ export function MediaImagePicker({
 
     setUploading(true);
     setError(null);
+    setInfo(null);
 
     try {
       const uploaded: string[] = [];
+      let adjustedCount = 0;
       for (const file of Array.from(files)) {
         if (!file.type.startsWith("image/")) {
           setError("Only image files are allowed.");
@@ -75,11 +103,22 @@ export function MediaImagePicker({
           setError("Image must be 10MB or smaller.");
           continue;
         }
-        const media = await apiUploadFile(file);
+        let uploadFile = file;
+        if (carouselBanner) {
+          const normalized = await normalizeCarouselBannerFile(file);
+          uploadFile = normalized.file;
+          if (normalized.adjusted) adjustedCount += 1;
+        }
+        const media = await apiUploadFile(uploadFile);
         if (media.url) uploaded.push(media.url);
       }
       if (uploaded.length) {
         applyUrls(singleImage ? uploaded : [...value, ...uploaded]);
+        if (carouselBanner && adjustedCount > 0) {
+          setInfo(
+            `${adjustedCount} image${adjustedCount === 1 ? "" : "s"} resized to 1024×320 px for perfect carousel display.`,
+          );
+        }
       }
     } catch (err) {
       setError(getApiErrorMessage(err, "Upload failed. Please try again."));
@@ -96,11 +135,42 @@ export function MediaImagePicker({
   const addFromLibrary = (url: string) => {
     if (singleImage) {
       onChange([url]);
+      setUrlDraft(url);
       setLibraryOpen(false);
       return;
     }
     if (!value.includes(url)) {
       onChange([...value, url]);
+    }
+  };
+
+  const applyImageUrl = async () => {
+    if (!urlDraft.trim()) {
+      setError("Enter an image URL first.");
+      setInfo(null);
+      return;
+    }
+
+    setUrlApplying(true);
+    setError(null);
+    setInfo(null);
+
+    try {
+      const storedUrl = await resolveCarouselBannerUrl(urlDraft);
+      applyUrls([storedUrl]);
+      setUrlDraft(storedUrl);
+      setError(null);
+      if (carouselBanner) {
+        setInfo(
+          storedUrl.startsWith("/uploads/")
+            ? `Banner image imported and ready (${CAROUSEL_BANNER_SIZE_LABEL} recommended).`
+            : `Image URL applied (${CAROUSEL_BANNER_SIZE_LABEL} recommended).`,
+        );
+      }
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Could not import image from URL."));
+    } finally {
+      setUrlApplying(false);
     }
   };
 
@@ -119,6 +189,7 @@ export function MediaImagePicker({
               <img
                 src={resolveMediaUrl(url)}
                 alt={`Selected image ${index + 1}`}
+                referrerPolicy="no-referrer"
                 className="h-28 w-full object-cover"
               />
               <div className="absolute inset-x-0 bottom-0 bg-black/60 px-2 py-1 text-[10px] text-white/80">
@@ -162,13 +233,58 @@ export function MediaImagePicker({
         </Button>
       </div>
 
+      {allowImageUrl && (
+        <div className="space-y-2 rounded-lg border border-border bg-muted/20 p-3">
+          <Label htmlFor={imageUrlInputId} className="text-sm font-medium">
+            Or paste image URL
+          </Label>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Input
+              id={imageUrlInputId}
+              type="text"
+              inputMode="url"
+              autoComplete="off"
+              spellCheck={false}
+              value={urlDraft}
+              onChange={(e) => setUrlDraft(e.target.value)}
+              placeholder="https://example.com/banner.jpg or /uploads/banner.jpg"
+              className="font-mono text-sm"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  void applyImageUrl();
+                }
+              }}
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="shrink-0"
+              disabled={urlApplying || !urlDraft.trim()}
+              onClick={() => void applyImageUrl()}
+            >
+              <Link2 className="mr-2 h-4 w-4" />
+              {urlApplying ? "Importing…" : "Use URL"}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Paste a direct link to a JPG, PNG, or WebP image. Recommended:{" "}
+            {CAROUSEL_BANNER_SIZE_LABEL}.
+          </p>
+        </div>
+      )}
+
       <p className="text-xs text-muted-foreground">
         {helpText ??
           (singleImage
-            ? "Upload JPG, PNG, or WebP (max 10MB) or pick from the media library."
+            ? allowImageUrl
+              ? "Upload an image, pick from the media library, or paste a direct image URL."
+              : "Upload JPG, PNG, or WebP (max 10MB) or pick from the media library."
             : "First image is used as the main photo. Upload JPG, PNG, or WebP (max 10MB).")}
       </p>
 
+      {info && <p className="text-sm text-primary">{info}</p>}
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       {libraryOpen && (

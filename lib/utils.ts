@@ -65,7 +65,26 @@ const CATALOG_IMAGE_FALLBACKS: Record<string, string> = {
 /** Turn stored media paths into browser-loadable URLs. */
 export function resolveMediaUrl(url: string): string {
   if (!url) return url;
-  if (/^https?:\/\//i.test(url)) return url;
+
+  if (/^https?:\/\//i.test(url)) {
+    try {
+      const parsed = new URL(url);
+      if (parsed.pathname.startsWith("/uploads/")) {
+        return `${API_ORIGIN}${parsed.pathname}`;
+      }
+      if (parsed.pathname.startsWith("/images/")) {
+        const file = parsed.pathname.split("/").pop() ?? "";
+        return CATALOG_IMAGE_FALLBACKS[file] ?? parsed.pathname;
+      }
+      if (parsed.hostname === "127.0.0.1" && parsed.port === "4000") {
+        return url.replace("127.0.0.1", "localhost");
+      }
+    } catch {
+      /* keep full URL */
+    }
+    return url;
+  }
+
   if (url.startsWith("/uploads/")) return `${API_ORIGIN}${url}`;
   if (url.startsWith("/images/")) {
     const file = url.split("/").pop() ?? "";

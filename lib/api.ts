@@ -89,3 +89,11 @@ export async function apiUploadFile(file: File): Promise<{ url: string; _id?: st
   );
   return data.data;
 }
+
+export async function apiImportImageUrl(url: string): Promise<{ url: string; _id?: string; id?: string }> {
+  const { data } = await api.post<ApiResponse<{ url: string; _id?: string; id?: string }>>(
+    "/media/import-url",
+    { url },
+  );
+  return data.data;
+}
